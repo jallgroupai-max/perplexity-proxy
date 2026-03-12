@@ -1,0 +1,62 @@
+[
+  {
+    "name": "__cf_bm",
+    "value": "5LCe_D.4ANqta_xT9ThJbP6UjroDeC1SU4H.mqxhgP4-1773262036-1.0.1.1-lk.RZw3_uNBCVNlHNEZVn3iLe_2qTW8IaZZHdvLUAivlIck4QoOsgQZ11Fa9YUehhWzsXkjcoKrHL1qyNcZcTTe2L5MKqvwhtO_eQaZzz.Q",
+    "domain": ".perplexity.ai",
+    "path": "/",
+    "expiresAt": "2026-03-11T21:17:15.089Z",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "__frs",
+    "value": "66ab3d68-a46d-4e33-8832-ee43afe4d275",
+    "domain": ".count.perplexity.ai",
+    "path": "/",
+    "expiresAt": "2026-03-11T21:55:28.697Z",
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "_fbp",
+    "value": "fb.1.1773256939531.146708955727772146",
+    "domain": ".perplexity.ai",
+    "path": "/",
+    "expiresAt": "2026-06-09T19:22:43.000Z",
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "cf_clearance",
+    "value": "ITwW24X3pqr1QEjNTM2jM5xjLrP2R50lWfGqt0AvlIQ-1773262530-1.2.1.1-JarT6mo0t3tnGSIKQq8TC1jljcIvg6Hmm4FuKTq9YcTDlIiBvIadPtKPpIx_DPNRQhygfPVzeiDGPToP77z.DTz53BHhBNMLFXGmj9CIKNYoCx4CRZ3bKOSafTUxsjV_8VPLTwZlH0rj8aQH4dcTYqs39xZXmOfY8Y4pXYlE_tJ7Bo.QVIPz_dgp7AUgQ4tmSlhYLkCIL6InRhsnhiW7cAL5H09lwUBGVsFwt.2.6tU",
+    "domain": ".perplexity.ai",
+    "path": "/",
+    "expiresAt": "2027-03-11T20:55:28.899Z",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "pplx.edge-sid",
+    "value": "e8ba874e-fa33-4809-8aa5-7ac7a53e2d1f",
+    "domain": ".perplexity.ai",
+    "path": "/",
+    "expiresAt": "2026-03-11T21:25:28.698Z",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  },
+  {
+    "name": "pplx.edge-vid",
+    "value": "e8b93a9e-19ca-4ed1-a606-57c68ac59c3e",
+    "domain": ".perplexity.ai",
+    "path": "/",
+    "expiresAt": "2027-03-11T20:55:28.698Z",
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "None"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "perplexity-proxy",
+  "version": "1.0.0",
+  "description": "Mirror proxy for Perplexity with Redis session sync",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "cookies": "node import-data.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "playwright": "^1.57.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "redis": "^5.11.0",
+    "ws": "^8.18.3"
+  }
+}
