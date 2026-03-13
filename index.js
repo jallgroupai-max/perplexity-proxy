@@ -264,8 +264,185 @@ function isStaticPath(pathname) {
   let isHandlingPage = false;
   const pageCache = new Map();
   const PAGE_CACHE_TTL = 5000;
+  const JALL_API_URL = process.env.JALL_API_URL || 'http://localhost:3002/api';
 
   const app = express();
+
+  function getParsedRequestUrl(req) {
+    return new URL(req.originalUrl || req.url || req.path || '/', 'http://localhost');
+  }
+
+  function getTokenFromCookieHeader(cookieHeader) {
+    if (!cookieHeader) return '';
+
+    const tokenCookie = cookieHeader
+      .split(';')
+      .find((cookieEntry) => cookieEntry.trim().startsWith('jall_token='));
+
+    if (!tokenCookie) {
+      return '';
+    }
+
+    return decodeURIComponent(tokenCookie.split('=').slice(1).join('=').trim());
+  }
+
+  function getAuthTokenFromRequest(req) {
+    const queryToken = req?.query?.token;
+    if (typeof queryToken === 'string' && queryToken.trim()) {
+      return queryToken.trim();
+    }
+
+    const urlToken = getParsedRequestUrl(req).searchParams.get('token');
+    if (urlToken && urlToken.trim()) {
+      return urlToken.trim();
+    }
+
+    return getTokenFromCookieHeader(req?.headers?.cookie || '');
+  }
+
+  function getRequestPathForProxy(req) {
+    const requestUrl = getParsedRequestUrl(req);
+    requestUrl.searchParams.delete('token');
+    return `${requestUrl.pathname}${requestUrl.search || ''}` || '/';
+  }
+
+  function renderAuthPage({ title, message, actionHref, actionLabel }) {
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      width: min(92vw, 420px);
+      padding: 32px;
+      border-radius: 18px;
+      background: #111827;
+      border: 1px solid #334155;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.45);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 26px;
+    }
+    p {
+      margin: 0 0 24px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+    a {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: #22c55e;
+      color: #052e16;
+      text-decoration: none;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>${title}</h1>
+    <p>${message}</p>
+    <a href="${actionHref}">${actionLabel}</a>
+  </div>
+</body>
+</html>`;
+  }
+
+  async function validateToken(token) {
+    try {
+      const url = `${JALL_API_URL}/user-accounts/validate-token?token=${encodeURIComponent(token)}`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        return { valid: false };
+      }
+
+      return await response.json();
+    } catch (error) {
+      logger.error('[AUTH] Token validation failed:', error.message);
+      return { valid: false };
+    }
+  }
+
+  async function requireValidToken(req, res) {
+    const authToken = getAuthTokenFromRequest(req);
+
+    if (!authToken) {
+      res.status(403).type('html').send(renderAuthPage({
+        title: 'Acceso denegado',
+        message: 'No se encontro un token valido para abrir este servicio.',
+        actionHref: 'https://jall.lat',
+        actionLabel: 'Adquirir membresia'
+      }));
+      return null;
+    }
+
+    const authData = await validateToken(authToken);
+    if (!authData?.valid) {
+      res.status(403).type('html').send(renderAuthPage({
+        title: 'Token invalido o expirado',
+        message: 'Tu token ya no es valido. Renuevalo desde Jall para continuar usando Perplexity.',
+        actionHref: 'https://jall.lat',
+        actionLabel: 'Renovar acceso'
+      }));
+      return null;
+    }
+
+    if (getParsedRequestUrl(req).searchParams.has('token')) {
+      res.cookie('jall_token', authToken, {
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000
+      });
+    }
+
+    return { authToken, authData };
+  }
+
+  function rejectUpgrade(socket, statusCode, message) {
+    const statusText = statusCode === 500 ? 'Internal Server Error' : 'Forbidden';
+    socket.write(
+      `HTTP/1.1 ${statusCode} ${statusText}\r\n` +
+      'Content-Type: text/plain; charset=utf-8\r\n' +
+      'Connection: close\r\n' +
+      `Content-Length: ${Buffer.byteLength(message)}\r\n\r\n` +
+      message
+    );
+    socket.destroy();
+  }
+
+  async function requireValidUpgradeToken(request, socket) {
+    const authToken = getAuthTokenFromRequest(request);
+
+    if (!authToken) {
+      logger.warn('[AUTH] Missing token for websocket upgrade');
+      rejectUpgrade(socket, 403, 'Missing token');
+      return null;
+    }
+
+    const authData = await validateToken(authToken);
+    if (!authData?.valid) {
+      logger.warn('[AUTH] Invalid token for websocket upgrade');
+      rejectUpgrade(socket, 403, 'Invalid token');
+      return null;
+    }
+
+    return { authToken, authData };
+  }
 
   async function attemptCloudflareTurnstile(pageInstance, reason = 'startup') {
     if (!pageInstance || pageInstance.isClosed()) {
@@ -582,7 +759,11 @@ function isStaticPath(pathname) {
   }
 
   async function handlePage(req, res) {
-    const targetPath = req.originalUrl || req.path;
+    if (!await requireValidToken(req, res)) {
+      return;
+    }
+
+    const targetPath = getRequestPathForProxy(req);
     const targetUrl = resolveHttpTarget(targetPath);
     const now = Date.now();
 
@@ -840,7 +1021,11 @@ function isStaticPath(pathname) {
 
   app.use(async (req, res) => {
     try {
-      const targetUrl = resolveHttpTarget(req.originalUrl || req.url || '/');
+      if (!await requireValidToken(req, res)) {
+        return;
+      }
+
+      const targetUrl = resolveHttpTarget(getRequestPathForProxy(req));
       await proxyExpressRequest(req, res, targetUrl);
     } catch (error) {
       logger.error('[HTTP] Proxy error:', error.message);
@@ -1129,23 +1314,38 @@ function isStaticPath(pathname) {
   });
 
   server.on('upgrade', (request, socket, head) => {
-    const pathname = new URL(request.url, 'http://localhost').pathname;
+    (async () => {
+      const pathname = new URL(request.url, 'http://localhost').pathname;
 
-    if (pathname === '/ws-tunnel') {
-      wsTunnelServer.handleUpgrade(request, socket, head, (ws) => {
-        wsTunnelServer.emit('connection', ws, request);
-      });
-      return;
-    }
+      if (pathname === '/ws-tunnel') {
+        if (!await requireValidUpgradeToken(request, socket)) {
+          return;
+        }
 
-    if (pathname.startsWith('/pplx-ws')) {
-      peoplexityWsServer.handleUpgrade(request, socket, head, (ws) => {
-        peoplexityWsServer.emit('connection', ws, request);
-      });
-      return;
-    }
+        wsTunnelServer.handleUpgrade(request, socket, head, (ws) => {
+          wsTunnelServer.emit('connection', ws, request);
+        });
+        return;
+      }
 
-    socket.destroy();
+      if (pathname.startsWith('/pplx-ws')) {
+        if (!await requireValidUpgradeToken(request, socket)) {
+          return;
+        }
+
+        peoplexityWsServer.handleUpgrade(request, socket, head, (ws) => {
+          peoplexityWsServer.emit('connection', ws, request);
+        });
+        return;
+      }
+
+      socket.destroy();
+    })().catch((error) => {
+      logger.error('[WS] Upgrade auth error:', error.message);
+      if (!socket.destroyed) {
+        rejectUpgrade(socket, 500, 'Upgrade authentication error');
+      }
+    });
   });
 
   server.listen(PORT, LISTEN_HOST, () => {
