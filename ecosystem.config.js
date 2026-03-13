@@ -3,10 +3,7 @@ module.exports = {
     {
       name: 'perplexity-proxy',
       script: './index.js',
-      cwd: __dirname,
-      env: {
-        HEADLESS: 'false'
-      }
+      cwd: __dirname
     }
   ]
 };

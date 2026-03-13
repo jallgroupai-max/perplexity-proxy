@@ -61,6 +61,105 @@ const logger = {
   }
 };
 
+function resolveMaybeRelativePath(inputPath) {
+  if (!inputPath) return '';
+  return path.isAbsolute(inputPath) ? inputPath : path.resolve(__dirname, inputPath);
+}
+
+function getDefaultChromeUserDataDir() {
+  if (process.platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA || path.join(require('os').homedir(), 'AppData', 'Local');
+    return path.join(localAppData, 'Google', 'Chrome', 'User Data');
+  }
+
+  return '';
+}
+
+function shouldSkipChromeCopy(sourcePath) {
+  const normalized = sourcePath.replace(/\//g, '\\');
+  const blockedFragments = [
+    '\\Singleton',
+    '\\Crashpad',
+    '\\BrowserMetrics',
+    '\\ShaderCache',
+    '\\GrShaderCache',
+    '\\DawnCache',
+    '\\Safe Browsing',
+    '\\OptimizationHints',
+    '\\Subresource Filter',
+    '\\OnDeviceHeadSuggestModel',
+    '\\PKIMetadata',
+    '\\CertificateRevocation',
+    '\\hyphen-data',
+    '\\ZxcvbnData'
+  ];
+  const blockedNames = ['LOCK', 'LOCKFILE', '.lock', 'SingletonLock', 'SingletonCookie', 'SingletonSocket'];
+  const baseName = path.basename(normalized);
+
+  if (blockedNames.includes(baseName)) {
+    return true;
+  }
+
+  return blockedFragments.some((fragment) => normalized.includes(fragment));
+}
+
+function copyDirectoryIfPresent(sourceDir, targetDir) {
+  if (!sourceDir || !fs.existsSync(sourceDir)) {
+    return false;
+  }
+
+  fs.mkdirSync(targetDir, { recursive: true });
+  fs.cpSync(sourceDir, targetDir, {
+    recursive: true,
+    force: true,
+    filter: (currentSource) => !shouldSkipChromeCopy(currentSource)
+  });
+  return true;
+}
+
+function syncChromeProfile({ sourceUserDataDir, targetUserDataDir, profileDirectory }) {
+  if (!sourceUserDataDir || !targetUserDataDir) {
+    return;
+  }
+
+  const normalizedSource = path.resolve(sourceUserDataDir);
+  const normalizedTarget = path.resolve(targetUserDataDir);
+
+  if (!fs.existsSync(normalizedSource)) {
+    throw new Error(`Chrome source user data dir not found: ${normalizedSource}`);
+  }
+
+  if (normalizedSource === normalizedTarget) {
+    logger.log('[PLAYWRIGHT] Using Chrome profile in-place without cloning');
+    return;
+  }
+
+  fs.mkdirSync(normalizedTarget, { recursive: true });
+
+  const rootFiles = ['Local State', 'First Run', 'Last Version', 'Variations'];
+  for (const fileName of rootFiles) {
+    const sourceFile = path.join(normalizedSource, fileName);
+    const targetFile = path.join(normalizedTarget, fileName);
+    if (fs.existsSync(sourceFile) && fs.statSync(sourceFile).isFile()) {
+      fs.copyFileSync(sourceFile, targetFile);
+    }
+  }
+
+  const sourceProfileDir = path.join(normalizedSource, profileDirectory);
+  const targetProfileDir = path.join(normalizedTarget, profileDirectory);
+  const copied = copyDirectoryIfPresent(sourceProfileDir, targetProfileDir);
+
+  if (!copied) {
+    throw new Error(`Chrome profile directory not found: ${sourceProfileDir}`);
+  }
+
+  logger.log('[PLAYWRIGHT] Chrome profile cloned', {
+    sourceUserDataDir: normalizedSource,
+    targetUserDataDir: normalizedTarget,
+    profileDirectory
+  });
+}
+
 const portSuffix = process.env.LOCAL === 'true' ? `:${PORT}` : '';
 const SERVER_URL = `${PROTOCOL}://${DOMAIN}${portSuffix}`;
 const WS_URL = `${PROTOCOL === 'https' ? 'wss' : 'ws'}://${DOMAIN}${portSuffix}`;
@@ -674,11 +773,12 @@ function isStaticPath(pathname) {
     ];
     if (!IS_HEADLESS) browserArgs.push('--start-maximized');
 
-    const configuredUserDataDir = process.env.CHROME_USER_DATA_DIR || 'chrome-profile';
-    const userDataDir = path.isAbsolute(configuredUserDataDir)
-      ? configuredUserDataDir
-      : path.resolve(__dirname, configuredUserDataDir);
-    const chromeProfileDirectory = (process.env.CHROME_PROFILE_DIRECTORY || '').trim();
+    const configuredUserDataDir = (process.env.CHROME_USER_DATA_DIR || './chrome-profile').trim();
+    const configuredSourceUserDataDir = (process.env.CHROME_SOURCE_USER_DATA_DIR || '').trim();
+    const chromeProfileDirectory = (process.env.CHROME_PROFILE_DIRECTORY || 'Default').trim() || 'Default';
+    const defaultChromeUserDataDir = getDefaultChromeUserDataDir();
+    const sourceUserDataDir = resolveMaybeRelativePath(configuredSourceUserDataDir || defaultChromeUserDataDir);
+    const userDataDir = resolveMaybeRelativePath(configuredUserDataDir);
 
     if (chromeProfileDirectory) {
       browserArgs.push(`--profile-directory=${chromeProfileDirectory}`);
@@ -692,9 +792,20 @@ function isStaticPath(pathname) {
       ignoreDefaultArgs: ['--enable-automation']
     };
     logger.log('[PLAYWRIGHT] Chrome profile config', {
+      sourceUserDataDir: sourceUserDataDir || 'not configured',
       userDataDir,
-      profileDirectory: chromeProfileDirectory || 'Default (implicit)'
+      profileDirectory: chromeProfileDirectory
     });
+
+    try {
+      syncChromeProfile({
+        sourceUserDataDir,
+        targetUserDataDir: userDataDir,
+        profileDirectory: chromeProfileDirectory
+      });
+    } catch (profileSyncError) {
+      logger.warn('[PLAYWRIGHT] Chrome profile sync skipped:', profileSyncError.message);
+    }
 
     try {
       if (process.env.CHROME_BIN) {
