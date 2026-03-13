@@ -267,6 +267,78 @@ function isStaticPath(pathname) {
 
   const app = express();
 
+  async function attemptCloudflareTurnstile(pageInstance, reason = 'startup') {
+    if (!pageInstance || pageInstance.isClosed()) {
+      return false;
+    }
+
+    try {
+      logger.log(`[CLOUDFLARE] Checking Turnstile challenge during ${reason}...`);
+      await pageInstance.waitForTimeout(3000);
+
+      const frames = pageInstance.frames();
+      const challengeFrame = frames.find((frame) => {
+        const frameUrl = frame.url();
+        return frameUrl.includes('cloudflare') || frameUrl.includes('turnstile');
+      });
+
+      if (!challengeFrame) {
+        logger.log('[CLOUDFLARE] No Turnstile iframe detected.');
+        return false;
+      }
+
+      logger.log('[CLOUDFLARE] Turnstile iframe detected. Simulating human click...');
+      const frameElement = await challengeFrame.frameElement();
+      const box = await frameElement.boundingBox();
+
+      if (!box) {
+        logger.warn('[CLOUDFLARE] Turnstile iframe has no bounding box.');
+        return false;
+      }
+
+      const x = box.x + (box.width / 4) + (Math.random() * 10);
+      const y = box.y + (box.height / 2) + (Math.random() * 5);
+
+      await pageInstance.mouse.move(x, y, { steps: 15 });
+      await pageInstance.waitForTimeout(100 + Math.random() * 200);
+      await pageInstance.mouse.down();
+      await pageInstance.waitForTimeout(50 + Math.random() * 80);
+      await pageInstance.mouse.up();
+
+      logger.log('[CLOUDFLARE] Simulated click completed. Waiting for challenge resolution...');
+      await pageInstance.waitForTimeout(5000);
+      return true;
+    } catch (error) {
+      logger.error('[CLOUDFLARE] Error while trying to solve Turnstile:', error.message);
+      return false;
+    }
+  }
+
+  async function ensureCloudflareClearance(pageInstance, reason = 'startup') {
+    if (!pageInstance || pageInstance.isClosed()) {
+      return;
+    }
+
+    try {
+      const pageTitle = (await pageInstance.title()).toLowerCase();
+      const needsClearance =
+        pageTitle.includes('just a moment') ||
+        pageTitle.includes('attention required') ||
+        pageTitle.includes('security verification');
+
+      if (!needsClearance) {
+        await attemptCloudflareTurnstile(pageInstance, reason);
+        return;
+      }
+
+      logger.warn(`[CLOUDFLARE] Challenge detected during ${reason}. Trying interactive clearance...`);
+      await attemptCloudflareTurnstile(pageInstance, reason);
+      await pageInstance.waitForTimeout(5000);
+    } catch (error) {
+      logger.warn('[CLOUDFLARE] Could not inspect current challenge state:', error.message);
+    }
+  }
+
   async function getCookieHeaderForUrl(targetUrl) {
     if (!context) return '';
     try {
@@ -541,6 +613,7 @@ function isStaticPath(pathname) {
       logger.log('[PAGE] Loading', targetUrl);
       await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForTimeout(300);
+      await ensureCloudflareClearance(page, 'page-render');
 
       let html = await page.content();
       html = html.replace(/nonce="[^"]*"/g, '');
@@ -890,14 +963,7 @@ function isStaticPath(pathname) {
     });
     await page.goto(TARGET, { waitUntil: IS_HEADLESS ? 'domcontentloaded' : 'networkidle', timeout: 30000 });
     await page.waitForTimeout(2500);
-
-    try {
-      const pageTitle = (await page.title()).toLowerCase();
-      if (pageTitle.includes('just a moment') || pageTitle.includes('attention required')) {
-        logger.warn('[PLAYWRIGHT] Cloudflare challenge detected, waiting for clearance...');
-        await page.waitForTimeout(8000);
-      }
-    } catch {}
+    await ensureCloudflareClearance(page, 'startup');
 
     logger.log('[PLAYWRIGHT] Browser context ready');
   } catch (error) {
