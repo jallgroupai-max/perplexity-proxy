@@ -1,28 +1,62 @@
 {
-  "pplx.local-user-settings.preferredSearchModels-v1": "{\"search\":\"turbo\"}",
-  "perplexity_ai_039eb8fb_ai.perplexity_singular_instance_id": "d59cedcb-b177-44e3-b32b-dd709d7131f4",
-  "pplx.sidebarLite.prevVisibleTabCount": "18",
-  "global_singular_id": "56434c10-8b57-4948-aa21-7226d822d5dc",
-  "perplexity_ai_039eb8fb_ai.perplexity_singular_first_page_visit_occurred": "true",
-  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.initialized singular": "true",
-  "pplx.livemark-md-parser.eppo_cache": "false",
-  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.__PAGE_VISIT__": "true",
-  "perplexity_ai_039eb8fb_ai.perplexity_did_visit_site": "true",
-  "perplexity_ai_039eb8fb_ai.perplexity_singular_session_id": "f664a449-1b31-4e81-9fd8-72e8836a8f70",
-  "dynamic-sources-config-enabled": "true",
-  "eppo-assignment-a2yUBlJ1": "[[\"30681ccb97f20a4dba05e05f1a3b10bf\",\"f6a2d51951baa445f478175c16f73e64\"]]",
-  "perplexity_ai_039eb8fb_ai.perplexity_touchpoint_timestamp": "1773256898",
-  "lastExternalReferrerTime": "1773256908717",
+  "dynamic-sources-config-enabled": true,
+  "global_singular_id": "a17bf917-27ba-4414-b412-3998d19aa0b4",
+  "locationMetadata": {
+    "permissionState": "prompt",
+    "updatedAt": 1773424205614
+  },
+  "mcp_disabled_servers_v1": [],
+  "perplexity_ai_039eb8fb_ai.perplexity_conversion_event_occurred": false,
+  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.__PAGE_VISIT__": true,
+  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.activated": true,
+  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.initialized singular": true,
+  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.query submitted": true,
+  "perplexity_ai_039eb8fb_ai.perplexity_did_visit_site": true,
   "perplexity_ai_039eb8fb_ai.perplexity_first_page_visit_url": "https://www.perplexity.ai/",
-  "perplexity_ai_039eb8fb_ai.perplexity_last_event_timestamp": "1773257473",
-  "pplx.local-user-settings.sidebarHubs": "[\"SIDEBAR_FINANCE\",\"SIDEBAR_DISCOVER\",\"SIDEBAR_SPACES\"]",
-  "locationMetadata": "{\"permissionState\":\"denied\",\"updatedAt\":1773256897611}",
-  "perplexity_ai_039eb8fb_ai.perplexity_web_url": "https://www.perplexity.ai/",
-  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.query submitted": "true",
-  "lastExternalReferrer": "other",
-  "pplx_show_comet_upsell_existing_comet_user": "true",
-  "pplx.perplexity-ask-asi.eppo_cache": "true",
-  "pplx.workflow-steps-supported.eppo_cache": "{\"search\":false,\"research\":false,\"agentic_research\":false,\"studio\":false,\"study\":false,\"document_review\":false,\"browser_agent\":false}",
-  "perplexity_ai_039eb8fb_ai.perplexity_did_send_event.activated": "true",
-  "mcp_disabled_servers_v1": "[]"
+  "perplexity_ai_039eb8fb_ai.perplexity_last_event_timestamp": 1773424206,
+  "perplexity_ai_039eb8fb_ai.perplexity_singular_custom_user_id": "35d240e7-4cff-4505-a798-ec689ec18f99",
+  "perplexity_ai_039eb8fb_ai.perplexity_singular_first_page_visit_occurred": true,
+  "perplexity_ai_039eb8fb_ai.perplexity_singular_instance_id": "fadd9d02-f8ba-46cc-87f7-ac609f97246c",
+  "perplexity_ai_039eb8fb_ai.perplexity_singular_session_id": "7e7a4c0e-4685-4423-b9a1-41d3003e0a6c",
+  "perplexity_ai_039eb8fb_ai.perplexity_touchpoint_timestamp": 1773258382,
+  "perplexity_ai_039eb8fb_ai.perplexity_web_url": "https://www.perplexity.ai/computer?utm_source=Google&utm_medium=g&utm_campaign=&utm_term=claude%20coed&wpsrc=Google&wpcid=23611667258&wpscid=192473089143&wpcrid=798682694796&wpkwid=kwd-2469963005495&wpkwn=claude%20coed&wpkmatch=p&wpsnetn=g&utm_creative=&wpcn=_inactivity-0d&gad_source=1&gad_campaignid=23611667258&gbraid=0AAAAA-YN3-tcl4QsGD6dizjTJ8S2gKJyu&gclid=CjwKCAjwpcTNBhA5EiwAdO1S9o2WMnXtIb6mmrPr2e5IhfCc0rJHA0WFMoLO7mZzYuDri0RraDf_9BoCMVUQAvD_BwE",
+  "pplx-next-auth-session": {
+    "expires": "2026-04-12T17:50:07.793546276Z",
+    "preventUsernameRedirect": false,
+    "user": {
+      "email": "perplexity@grupojall.com",
+      "id": "35d240e7-4cff-4505-a798-ec689ec18f99",
+      "image": "https://imagedelivery.net/MPdwyYSWT8IY7lxgN3x3Uw/267800464-4a1te0zv.png/thumbnail",
+      "name": "Grupo Jall",
+      "org_role": "none",
+      "org_uuid": "none",
+      "payment_tier": "free_with_pm",
+      "subscription_source": "stripe",
+      "subscription_status": "active",
+      "subscription_tier": "pro",
+      "username": "perplexityjall"
+    }
+  },
+  "pplx.computer-last-route": "/computer/tasks",
+  "pplx.livemark-md-parser.eppo_cache": false,
+  "pplx.local-user-settings.preferredSearchModels-v1": {
+    "search": "pplx_pro"
+  },
+  "pplx.local-user-settings.sidebarHubs": [
+    "SIDEBAR_FINANCE",
+    "SIDEBAR_DISCOVER",
+    "SIDEBAR_SPACES"
+  ],
+  "pplx.perplexity-ask-asi.eppo_cache": true,
+  "pplx.sidebarLite.prevVisibleTabCount": 17,
+  "pplx.workflow-steps-supported.eppo_cache": {
+    "search": false,
+    "research": false,
+    "agentic_research": false,
+    "studio": false,
+    "study": false,
+    "document_review": false,
+    "browser_agent": false
+  },
+  "pplx_show_comet_upsell_existing_comet_user": true
 }

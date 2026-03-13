@@ -1,62 +1,72 @@
 [
   {
     "name": "__cf_bm",
-    "value": "5LCe_D.4ANqta_xT9ThJbP6UjroDeC1SU4H.mqxhgP4-1773262036-1.0.1.1-lk.RZw3_uNBCVNlHNEZVn3iLe_2qTW8IaZZHdvLUAivlIck4QoOsgQZ11Fa9YUehhWzsXkjcoKrHL1qyNcZcTTe2L5MKqvwhtO_eQaZzz.Q",
+    "value": "Yinw9asg7XnPFNIVEr5h3Uw7OyuwZC71QZg2NI4tgIw-1773423424-1.0.1.1-IXiAh3ynXO96VLPjoWuIH00EZe.ZmhMfWNyyDeShr5tPPT9ROP1.rZXm74tXMrrGJ3YKo7WmxP8VrauqJ869KEAo47.tsmvourDjztqeQjM",
     "domain": ".perplexity.ai",
     "path": "/",
-    "expiresAt": "2026-03-11T21:17:15.089Z",
+    "expires": "2026-03-13T18:07:02.224Z",
+    "size": 177,
     "httpOnly": true,
     "secure": true,
-    "sameSite": "None"
+    "sameSite": "None",
+    "priority": "Medium"
   },
   {
     "name": "__frs",
-    "value": "66ab3d68-a46d-4e33-8832-ee43afe4d275",
+    "value": "44ed2ce8-45d9-4891-8bc3-486271087d44",
     "domain": ".count.perplexity.ai",
     "path": "/",
-    "expiresAt": "2026-03-11T21:55:28.697Z",
-    "httpOnly": false,
+    "expires": "2026-03-13T18:50:05.712Z",
+    "size": 41,
     "secure": true,
-    "sameSite": "None"
+    "sameSite": "None",
+    "priority": "Medium"
   },
   {
     "name": "_fbp",
     "value": "fb.1.1773256939531.146708955727772146",
     "domain": ".perplexity.ai",
     "path": "/",
-    "expiresAt": "2026-06-09T19:22:43.000Z",
-    "httpOnly": false,
-    "secure": false,
-    "sameSite": "Lax"
+    "expires": "2026-06-11T15:06:34.000Z",
+    "size": 41,
+    "sameSite": "Lax",
+    "priority": "Medium"
   },
   {
     "name": "cf_clearance",
-    "value": "ITwW24X3pqr1QEjNTM2jM5xjLrP2R50lWfGqt0AvlIQ-1773262530-1.2.1.1-JarT6mo0t3tnGSIKQq8TC1jljcIvg6Hmm4FuKTq9YcTDlIiBvIadPtKPpIx_DPNRQhygfPVzeiDGPToP77z.DTz53BHhBNMLFXGmj9CIKNYoCx4CRZ3bKOSafTUxsjV_8VPLTwZlH0rj8aQH4dcTYqs39xZXmOfY8Y4pXYlE_tJ7Bo.QVIPz_dgp7AUgQ4tmSlhYLkCIL6InRhsnhiW7cAL5H09lwUBGVsFwt.2.6tU",
+    "value": "NS3WDPmjJM7fVlhEIIdEuv51q34XzWkfvVC6ZeUNASY-1773424208-1.2.1.1-dgTITOUPMjSzNk8yxbiiRaw6tpZWWx_T7f4_lpgJEkiPP9IfIK5G329ESSCa_yJoXIQ0p1ydC03KKBUKCyqn.w3bdneyvfrCCuoSuF.uDxLCc9yD02P3xyfIWNPooUVmQYyEtbO_h1I1Pm2vBM3QMUjijwkq1LfaT6pd_49YKUrvyopyFBsSmW2dxzIxDVHuk_gYcNroCXmz1kxWT2ClfwCo4V6scWs4VLYdSZ052Lw",
     "domain": ".perplexity.ai",
     "path": "/",
-    "expiresAt": "2027-03-11T20:55:28.899Z",
+    "expires": "2027-03-13T17:50:05.949Z",
+    "size": 310,
     "httpOnly": true,
     "secure": true,
-    "sameSite": "None"
+    "sameSite": "None",
+    "priority": "Medium",
+    "origin": "https://perplexity.ai"
   },
   {
     "name": "pplx.edge-sid",
-    "value": "e8ba874e-fa33-4809-8aa5-7ac7a53e2d1f",
+    "value": "3c75d4d5-d562-4776-86bf-e24caa4be932",
     "domain": ".perplexity.ai",
     "path": "/",
-    "expiresAt": "2026-03-11T21:25:28.698Z",
+    "expires": "2026-03-13T18:20:06.812Z",
+    "size": 49,
     "httpOnly": true,
     "secure": true,
-    "sameSite": "None"
+    "sameSite": "None",
+    "priority": "Medium"
   },
   {
     "name": "pplx.edge-vid",
     "value": "e8b93a9e-19ca-4ed1-a606-57c68ac59c3e",
     "domain": ".perplexity.ai",
     "path": "/",
-    "expiresAt": "2027-03-11T20:55:28.698Z",
+    "expires": "2027-03-13T17:50:06.812Z",
+    "size": 49,
     "httpOnly": true,
     "secure": true,
-    "sameSite": "None"
+    "sameSite": "None",
+    "priority": "Medium"
   }
 ]

@@ -674,6 +674,16 @@ function isStaticPath(pathname) {
     ];
     if (!IS_HEADLESS) browserArgs.push('--start-maximized');
 
+    const configuredUserDataDir = process.env.CHROME_USER_DATA_DIR || 'chrome-profile';
+    const userDataDir = path.isAbsolute(configuredUserDataDir)
+      ? configuredUserDataDir
+      : path.resolve(__dirname, configuredUserDataDir);
+    const chromeProfileDirectory = (process.env.CHROME_PROFILE_DIRECTORY || '').trim();
+
+    if (chromeProfileDirectory) {
+      browserArgs.push(`--profile-directory=${chromeProfileDirectory}`);
+    }
+
     const launchOptions = {
       headless: IS_HEADLESS,
       args: browserArgs,
@@ -681,8 +691,10 @@ function isStaticPath(pathname) {
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--enable-automation']
     };
-
-    const userDataDir = process.env.CHROME_USER_DATA_DIR || path.join(__dirname, 'chrome-profile');
+    logger.log('[PLAYWRIGHT] Chrome profile config', {
+      userDataDir,
+      profileDirectory: chromeProfileDirectory || 'Default (implicit)'
+    });
 
     try {
       if (process.env.CHROME_BIN) {
