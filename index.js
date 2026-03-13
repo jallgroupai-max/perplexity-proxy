@@ -72,6 +72,32 @@ function getDefaultChromeUserDataDir() {
     return path.join(localAppData, 'Google', 'Chrome', 'User Data');
   }
 
+  if (process.platform === 'linux') {
+    const homeDir = require('os').homedir();
+    const linuxCandidates = [
+      path.join(homeDir, '.config', 'google-chrome'),
+      path.join(homeDir, '.config', 'google-chrome-stable'),
+      path.join(homeDir, '.config', 'chromium')
+    ];
+
+    return linuxCandidates.find((candidate) => fs.existsSync(candidate)) || linuxCandidates[0];
+  }
+
+  return '';
+}
+
+function getDefaultChromeExecutablePath() {
+  if (process.platform === 'linux') {
+    const linuxCandidates = [
+      '/usr/bin/google-chrome',
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/chromium',
+      '/usr/bin/chromium-browser'
+    ];
+
+    return linuxCandidates.find((candidate) => fs.existsSync(candidate)) || '';
+  }
+
   return '';
 }
 
@@ -808,8 +834,13 @@ function isStaticPath(pathname) {
     }
 
     try {
-      if (process.env.CHROME_BIN) {
-        launchOptions.executablePath = process.env.CHROME_BIN;
+      const configuredChromeBin = (process.env.CHROME_BIN || '').trim();
+      const defaultChromeBin = getDefaultChromeExecutablePath();
+
+      if (configuredChromeBin) {
+        launchOptions.executablePath = configuredChromeBin;
+      } else if (defaultChromeBin) {
+        launchOptions.executablePath = defaultChromeBin;
       } else {
         launchOptions.channel = 'chrome';
       }
